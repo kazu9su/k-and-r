@@ -4,9 +4,19 @@ int my_getline(char *s, int lim);
 
 int main()
 {
-    char *s;
+    {
+        char *s;
 
-    printf("%d\n", my_getline(s, 1000));
+        printf("%d\n", my_getline(s, 1000));
+    }
+
+    {
+        char *s;
+
+        itoa(1111, s);
+
+        printf("%s\n", s);
+    }
 
     return 0;
 }
@@ -25,3 +35,5 @@ int my_getline(char *s, int lim)
 
     return i;
 }
+
+
