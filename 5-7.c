@@ -5,17 +5,19 @@
 
 char *lineptr[MAXLINES];
 
-int readlines(char *lineptr[], int nlines);
+int readlines(char *lineptr[], int nlines, char *buf_lines);
 void writelines(char *lineptr[], int nlines);
 
 void qsort(char *lineptr[], int left, int right);
-char *alloc(int n);
+#define MAXLEN 1000
+int getline_mine(char *, int);
 
 int main()
 {
     int nlines;
+    char buf_lines[MAXLINES * MAXLEN];
 
-    if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+    if ((nlines = readlines(lineptr, MAXLINES, buf_lines)) >= 0) {
         qsort(lineptr, 0, nlines-1);
         writelines(lineptr, nlines);
         return 0;
@@ -25,23 +27,21 @@ int main()
     }
 }
 
-#define MAXLEN 1000
-int getline_mine(char *, int);
-
 /* readlines: 入力行を読み込む */
-int readlines(char *lineptr[], int maxlines)
+int readlines(char *lineptr[], int maxlines, char *buf_lines)
 {
-    int len, nlines;
+    int len, nlines, i;
     char *p, line[MAXLEN];
 
-    nlines = 0;
+    nlines = i = 0;
     while ((len = getline_mine(line, MAXLEN)) > 0)
-        if (nlines >= maxlines || (p = alloc(len)) == NULL)
+        if (nlines >= maxlines)
             return -1;
         else {
             line[len-1] = '\0'; /* 改行を消す */
-            strcpy(p, line);
-            lineptr[nlines++] = p;
+            strcpy(&buf_lines[i], line);
+            lineptr[nlines++] = &buf_lines[i];
+            i += len;
         }
 
     return nlines;
@@ -97,19 +97,3 @@ int getline_mine(char s[], int lim)
 
     return i;
 }
-
-#define ALLOCSIZE 10000
-
-static char allocbuf[ALLOCSIZE]; /* allocのための記憶場所*/
-static char *allocp = allocbuf; /* 次の空き位置 */
-
-char *alloc(int n) /* n 文字へのポインタを返す*/
-{
-    if (allocbuf + ALLOCSIZE - allocp >= n) { /* 入りきる */
-        allocp += n;
-        return allocp - n; /* 古いp */
-    }
-
-    return 0;
-}
-
